@@ -247,10 +247,11 @@ module CanCan
       #
       def check_authorization(options = {})
         self.after_filter(options.slice(:only, :except)) do |controller|
-          return if controller.instance_variable_defined?(:@_authorized)
-          return if options[:if] && !controller.send(options[:if])
-          return if options[:unless] && controller.send(options[:unless])
-          raise AuthorizationNotPerformed, "This action failed the check_authorization because it does not authorize_resource. Add skip_authorization_check to bypass this check."
+          if !controller.instance_variable_defined?(:@_authorized) &&
+             !(options[:if] && !controller.send(options[:if])) &&
+             !(options[:unless] && controller.send(options[:unless]))
+            raise AuthorizationNotPerformed, "This action failed the check_authorization because it does not authorize_resource. Add skip_authorization_check to bypass this check."
+          end
         end
       end
 
